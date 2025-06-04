@@ -1,0 +1,2 @@
+[console_scripts]
+git-branch-splitter = git_branch_splitter.cli:app

@@ -1,6 +1,6 @@
 import json
 from typing import List
-from models import BranchSpec
+from git_branch_splitter.models import BranchSpec
 
 
 def load_specs(spec_file_path: str) -> List[BranchSpec]:

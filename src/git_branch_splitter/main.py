@@ -1,5 +1,5 @@
-from github_client import GitHubClient
-from models import BranchSpec
+from git_branch_splitter.github_client import GitHubClient
+from git_branch_splitter.models import BranchSpec
 from typing import List
 
 

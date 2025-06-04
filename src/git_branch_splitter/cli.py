@@ -1,8 +1,8 @@
 import typer
-from utils import load_specs
-from main import run
+from git_branch_splitter.utils import load_specs
+from git_branch_splitter.main import run
 import json
-from github_client import GitHubClient
+from git_branch_splitter.github_client import GitHubClient
 import os
 import subprocess
 import re
@@ -101,11 +101,20 @@ def split(
 
 @app.command()
 def list_files(
-    branch: str = typer.Option(..., help="The branch to inspect."),
+    branch: str | None = typer.Option(
+        None,
+        help="The branch to inspect. If not provided, will use the current branch.",
+    ),
     base: str = typer.Option(..., help="The base branch to compare against."),
-    repo: str = typer.Option(..., help="GitHub repo, e.g., user/repo"),
-    token: str = typer.Option(..., help="GitHub token"),
+    repo: str | None = typer.Option(None, help="GitHub repo, e.g., user/repo"),
+    token: str | None = typer.Option(
+        None, help="GitHub token (can use GH_TOKEN env var)."
+    ),
 ):
+    token = get_token(token)
+    repo = get_repo(repo)
+    branch = branch or get_current_branch()
+
     client = GitHubClient(token, repo)
     files = client.get_changed_files(base, branch)
 
