@@ -62,10 +62,29 @@ def get_repo(provided_repo: str | None = None) -> str:
         raise RuntimeError(f"❌ Unrecognized GitHub remote URL format: {remote_url}")
 
 
+def get_current_branch() -> str:
+    try:
+        branch = (
+            subprocess.check_output(
+                ["git", "symbolic-ref", "--short", "HEAD"], stderr=subprocess.DEVNULL
+            )
+            .decode()
+            .strip()
+        )
+        return branch
+    except subprocess.CalledProcessError:
+        raise RuntimeError(
+            "❌ Could not determine current branch. Are you in a detached HEAD?"
+        )
+
+
 @app.command()
 def split(
     specs: str = typer.Option(..., help="Path to JSON spec file."),
-    base_branch: str = typer.Option(..., help="Name of the base branch."),
+    base_branch: str | None = typer.Option(
+        None,
+        help="Name of the base branch. If not provided, will use the current branch.",
+    ),
     repo: str | None = typer.Option(None, help="GitHub repo, e.g., user/repo"),
     token: str | None = typer.Option(
         None, help="GitHub token (can use GH_TOKEN env var)."
@@ -75,6 +94,7 @@ def split(
 
     token = get_token(token)
     repo = get_repo(repo)
+    base_branch = base_branch or get_current_branch()
 
     run(branch_specs, repo, token, base_branch)
 
